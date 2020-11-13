@@ -4,6 +4,11 @@
 
 package wasm
 
+import (
+	"fmt"
+	// "log"
+)
+
 type Logger interface {
 	Printf(string, ...interface{})
 	Println(string, ...interface{})
@@ -21,8 +26,12 @@ func SetLogger(l Logger) {
 
 type NoopLogger struct{}
 
-func (l NoopLogger) Printf(fmt string, v ...interface{})  {}
-func (l NoopLogger) Println(fmt string, v ...interface{}) {}
+func (l NoopLogger) Printf(format string, v ...interface{}) {
+	fmt.Printf(format, v...)
+}
+func (l NoopLogger) Println(format string, v ...interface{}) {
+	fmt.Println(fmt.Sprintf(format, v...))
+}
 
 /*
 import (

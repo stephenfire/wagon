@@ -682,7 +682,7 @@ func (g *CGenContext) Generate() ([]byte, error) {
 		if i > 0 {
 			buf.WriteString(", ")
 		}
-		buf.WriteString(fmt.Sprintf("%d", val))
+		buf.WriteString(fmt.Sprintf("%v", val))
 	}
 	buf.WriteString("};\n")
 
