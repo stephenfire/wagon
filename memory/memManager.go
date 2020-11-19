@@ -25,9 +25,9 @@ type MemManager struct {
 	Memory        []byte
 	maxHeapSize   int
 	currHeapSize  int
-	fixedDataIdx  int   //data section end idx
-	fixedStackIdx int   //stack section end idx
-	memAllocTree  []int //memory manager tree
+	fixedDataIdx  int   // data section end idx
+	fixedStackIdx int   // stack section end idx
+	memAllocTree  []int // memory manager tree
 }
 
 var memInitPool [][]int
@@ -145,7 +145,9 @@ func (mm *MemManager) Free(ptri64 uint64) error {
 		return err
 	}
 	nodeSize := 1
+	// 先定位到 内存管理树最底层的对应节点上。（因为offset最大就是最底层节点的个数，其上层的所有节点比最底层节点个数少1个）
 	index := offset + mm.currHeapSize/MinAllocMemSize - 1
+	// 从最底层逐层向上找到那个这一支上的被占用的内存index，同时计算出该层节点所代表的内存大小
 	for ; mm.memAllocTree[index] != 0; index = parent(index) {
 		nodeSize *= 2
 		if index == 0 {
