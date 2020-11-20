@@ -96,21 +96,24 @@ type VM struct {
 }
 
 func CeateVMemory(module *wasm.Module) (*memory.MemManager, error) {
-	exportEntry, ok := module.Export.Entries["__heap_base"]
-	if !ok {
-		return nil, errors.New("invalid memory no __heap_base")
-	}
-	if exportEntry.Kind != wasm.ExternalGlobal {
-		return nil, errors.New("invalid type of __heap_base")
-	}
-	globalEntry := module.GetGlobal(int(exportEntry.Index))
-	valTmp, err := module.ExecInitExpr(globalEntry.Init)
-	if err != nil {
-		return nil, err
-	}
-	val, ok := valTmp.(int32)
-	if !ok {
-		return nil, errors.New("invalid global init expression")
+	var val int32
+	if exportEntry, ok := module.Export.Entries["__heap_base"]; ok {
+		if exportEntry.Kind != wasm.ExternalGlobal {
+			return nil, errors.New("invalid type of __heap_base")
+		}
+		globalEntry := module.GetGlobal(int(exportEntry.Index))
+		valTmp, err := module.ExecInitExpr(globalEntry.Init)
+		if err != nil {
+			return nil, err
+		}
+		val, ok = valTmp.(int32)
+		if !ok {
+			return nil, errors.New("invalid global init expression")
+		}
+	} else {
+		// if !ok {
+		// 	return nil, errors.New("invalid memory no __heap_base")
+		// }
 	}
 	heapBase := int(val)
 	initMemSize := int(module.Memory.Entries[0].Limits.Initial) * wasmPageSize

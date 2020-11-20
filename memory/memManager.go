@@ -48,6 +48,9 @@ func init() {
 }
 
 func InitMemManager(dataEndIdx int, size int, maxMemSize int) (*MemManager, error) {
+	if dataEndIdx == 0 {
+		dataEndIdx = FixedStackIdx
+	}
 	if dataEndIdx-FixedStackIdx >= MaxDataMemSize {
 		return nil, ErrMemoryOverMaxLimit
 	}
@@ -102,6 +105,7 @@ func (mm *MemManager) Malloc(size int) (uint64, error) {
 	if size == 0 {
 		return 0, nil
 	}
+	osize := size
 	if !isPowerOf2(size) {
 		size = fixSize(size)
 	}
@@ -124,6 +128,7 @@ func (mm *MemManager) Malloc(size int) (uint64, error) {
 			index = rightChild(index)
 		}
 	}
+	idxOffset := index
 	mm.memAllocTree[index] = 0 // mark zero as used
 	offset := (index+1)*pages - currPages
 	// update the parent node's size
@@ -132,6 +137,7 @@ func (mm *MemManager) Malloc(size int) (uint64, error) {
 		mm.memAllocTree[index] = max(mm.memAllocTree[leftChild(index)], mm.memAllocTree[rightChild(index)])
 	}
 	memOffset := mm.getMemOffset(offset)
+	fmt.Printf("Malloc: ptr:%d index:%d need:%d size:%d page:%d\n", memOffset, idxOffset, osize, size, pages)
 	return uint64(memOffset), nil
 }
 
@@ -154,6 +160,8 @@ func (mm *MemManager) Free(ptri64 uint64) error {
 			return ErrInvalidMemoryIdx
 		}
 	}
+	idxOffset := index
+	idxSize := nodeSize
 	mm.memAllocTree[index] = nodeSize
 	// update parent node's size
 	for index != 0 {
@@ -167,6 +175,7 @@ func (mm *MemManager) Free(ptri64 uint64) error {
 			mm.memAllocTree[index] = max(leftSize, rightSize)
 		}
 	}
+	fmt.Printf("Free: ptr:%d index:%d page:%d\n", ptri64, idxOffset, idxSize)
 	return nil
 }
 
