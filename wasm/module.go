@@ -72,6 +72,7 @@ type Module struct {
 	// the limit of each table is its capacity (cap)
 	TableIndexSpace        [][]TableEntry
 	LinearMemoryIndexSpace [][]byte
+	DataEndAt              int
 
 	ImportFuncMap   map[string]uint32
 	ImportGlobalMap map[string]uint32

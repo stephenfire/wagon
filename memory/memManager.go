@@ -47,11 +47,11 @@ func init() {
 	}
 }
 
-func InitMemManager(dataEndIdx int, size int, maxMemSize int) (*MemManager, error) {
-	if dataEndIdx == 0 {
-		dataEndIdx = FixedStackIdx
+func InitMemManager(dataStartIdx, dataEndIdx int, size int, maxMemSize int) (*MemManager, error) {
+	if dataEndIdx < dataStartIdx {
+		return nil, errors.New("invalid data indexes")
 	}
-	if dataEndIdx-FixedStackIdx >= MaxDataMemSize {
+	if dataEndIdx-dataStartIdx >= MaxDataMemSize {
 		return nil, ErrMemoryOverMaxLimit
 	}
 	if !isPowerOf2(size) {
@@ -79,7 +79,7 @@ func InitMemManager(dataEndIdx int, size int, maxMemSize int) (*MemManager, erro
 		maxHeapSize:   maxMemSize,
 		currHeapSize:  size,
 		fixedDataIdx:  dataEndIdx,
-		fixedStackIdx: FixedStackIdx,
+		fixedStackIdx: dataStartIdx,
 		memAllocTree:  memAllocTree,
 	}, nil
 }

@@ -6,6 +6,7 @@ package exec
 
 import (
 	"bytes"
+	"io/ioutil"
 	"testing"
 
 	"github.com/go-interpreter/wagon/wasm"
@@ -212,6 +213,14 @@ func TestGoFunctionCallChecksForFirstArgument(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Error executing the default function: %v", err)
 	}
+}
+
+func TestSaveToWasm(t *testing.T) {
+	filename := "/Users/stephen/dev/workspaces/git/gasm/src/github.com/mathetake/gasm/tests/callhost.wasm"
+	if err := ioutil.WriteFile(filename, moduleCallHost, 0644); err != nil {
+		t.Fatalf("save to %s failed: %v", filename, err)
+	}
+	t.Logf("%s saved", filename)
 }
 
 func terminate(proc *Process, x int32) int32 {

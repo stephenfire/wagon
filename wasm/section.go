@@ -131,13 +131,13 @@ func (sr *sectionsReader) readSections(r *readpos.ReadPos) error {
 func (sr *sectionsReader) readSection(r *readpos.ReadPos) (bool, error) {
 	m := sr.m
 
-	logger.Println("Reading section ID")
 	id, err := r.ReadByte()
 	if err == io.EOF {
 		return true, nil
 	} else if err != nil {
 		return false, err
 	}
+	logger.Println("Reading section ID", id)
 	if id != uint8(SectionIDCustom) {
 		if id <= sr.lastSecOrder {
 			return false, fmt.Errorf("wasm: sections must occur at most once and in the prescribed order")
@@ -147,14 +147,12 @@ func (sr *sectionsReader) readSection(r *readpos.ReadPos) (bool, error) {
 
 	s := RawSection{ID: SectionID(id)}
 
-	logger.Println("Reading payload length")
-
 	payloadDataLen, err := leb128.ReadVarUint32(r)
 	if err != nil {
 		return false, err
 	}
 
-	logger.Printf("Section payload length: %d", payloadDataLen)
+	logger.Printf("Reading payload length of %s: %d\n", s.ID, payloadDataLen)
 
 	s.Start = r.CurPos
 

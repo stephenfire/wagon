@@ -231,10 +231,17 @@ func (m *Module) populateLinearMemory() error {
 			return InvalidValueTypeInitExprError{reflect.Int32, reflect.TypeOf(val).Kind()}
 		}
 		offset := uint32(off)
+		end := int(offset) + len(entry.Data)
+
+		if end > m.DataEndAt {
+			m.DataEndAt = end
+		}
 
 		memory := m.LinearMemoryIndexSpace[entry.Index]
-		if uint64(offset)+uint64(len(entry.Data)) > uint64(len(memory)) {
-			data := make([]byte, uint64(offset)+uint64(len(entry.Data)))
+		if end > len(memory) {
+			// if uint64(offset)+uint64(len(entry.Data)) > uint64(len(memory)) {
+			// 	data := make([]byte, uint64(offset)+uint64(len(entry.Data)))
+			data := make([]byte, end)
 			copy(data, memory)
 			copy(data[offset:], entry.Data)
 			m.LinearMemoryIndexSpace[int(entry.Index)] = data

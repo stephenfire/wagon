@@ -3,7 +3,7 @@ package memory
 import "testing"
 
 func TestMemManager(t *testing.T) {
-	mem, err := InitMemManager(0, DefaultMinHeapMemSize, DefaultMaxHeapMemSize)
+	mem, err := InitMemManager(0, 0, DefaultMinHeapMemSize, DefaultMaxHeapMemSize)
 	if err != nil {
 		t.Fatalf("init mem failed: %v", err)
 	}
